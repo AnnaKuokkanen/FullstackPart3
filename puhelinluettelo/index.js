@@ -21,11 +21,22 @@ let persons = [
       name: "Charles Babbage",
       number: "0394023439",
       id: 4
+  },
+  {
+      name: "John von Neumann", 
+      number: "2438872390",
+      id: 5
   }
 ]
 
 app.get('/api/persons', (req, res) => {
   res.json(persons)
+})
+
+app.get('/info', (req, res) => {
+  const date = new Date().getTime()
+  res.send(`<p>Phonebook has info for ${persons.length} people</p>
+            <p>Date: ${new Date()}</p>`)
 })
 
 const port = 3001
