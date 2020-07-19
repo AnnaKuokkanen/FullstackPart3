@@ -1,9 +1,11 @@
 var morgan = require('morgan')
+const cors = require('cors')
 const express = require('express')
 const app = express()
 
 app.use(express.json())
-app.use(morgan(':method :url :status :req[content-length] - :response-time ms :persondata'))
+app.use(cors())
+app.use(morgan(':method :url :status :req[content-length] - :response-time ms :req[persondata]'))
 
 let persons = [
   {
@@ -63,21 +65,17 @@ app.delete('/api/persons/:id', (req, res) => {
 app.post('/api/persons', (req, res) => {
   const person = req.body
   if (!person.name || !person.number) {
-    //console.log('error, cont missing')
     return res.status(400).json({ 
       error: 'content missing' 
     })
   }
   if (persons.filter(p => p.name === person.name).length > 0) {
-    //console.log('error, name must be unique')
     return res.status(400).json({ 
       error: 'name must be unique' 
     })
   }
   person.id = Math.round(Math.random() * 1000)
   morgan.token('persondata', function (req, res) { return JSON.stringify(req.body) })
-  //console.log('Id: ', person.id)
-  //console.log('Person: ', person)
   persons = persons.concat(person)
   res.json(persons)
 })
