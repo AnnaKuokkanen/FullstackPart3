@@ -26,14 +26,16 @@ const person = new Person({
   id : process.argv[5],
 })
 
-person.save().then(response => {
-  console.log(`added ${response.name} number ${response.number} to phonebook`)
-  mongoose.connection.close()
-})
-
-Person.find({}).then(result => {
-    result.forEach(person => {
-        console.log(person)
-    })
+if (person.name && person.number && person.id) {
+    person.save().then(response => {
+    console.log(`added ${response.name} number ${response.number} to phonebook`)
     mongoose.connection.close()
-})
+    })
+} else {
+    Person.find({}).then(result => {
+        result.forEach(person => {
+            console.log(person)
+        })
+        mongoose.connection.close()
+    })
+}
