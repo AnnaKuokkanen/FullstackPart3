@@ -21,15 +21,15 @@ const personSchema = new mongoose.Schema({
 const Person = mongoose.model('Person', personSchema)
 
 const person = new Person({
-  name: 'Robert Plant',
-  number: '0412343894',
-  id : 1,
+  name: process.argv[3],
+  number: process.argv[4],
+  id : process.argv[5],
 })
 
-// person.save().then(response => {
-//   console.log('note saved!')
-//   mongoose.connection.close()
-// })
+person.save().then(response => {
+  console.log(`added ${response.name} number ${response.number} to phonebook`)
+  mongoose.connection.close()
+})
 
 Person.find({}).then(result => {
     result.forEach(person => {
