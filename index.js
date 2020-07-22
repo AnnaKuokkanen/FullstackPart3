@@ -95,14 +95,15 @@ app.post('/api/persons', (req, res) => {
       error: 'content missing' 
     })
   }
-  if (persons.filter(p => p.name === person.name).length > 0) {
-    return res.status(400).json({ 
-      error: 'name must be unique' 
-    })
-  }
-  person.id = Math.round(Math.random() * 1000)
-  persons = persons.concat(person)
-  res.json(persons)
+  const id = Math.round(Math.random() * 1000)
+  const p = new Person({
+    name: person.name,
+    number: person.number,
+    id: id,
+  })
+  p.save().then(savedPerson => {
+  res.json(savedPerson)
+  })
 })
 
 const PORT = process.env.PORT
