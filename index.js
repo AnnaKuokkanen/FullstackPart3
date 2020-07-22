@@ -40,7 +40,18 @@ let persons = [
 ]
 
 app.get('/api/persons', (req, res) => {
-  res.json(persons)
+  let personsArray = []
+  Person.find({}).then(result => {
+    result.forEach(person => {
+        console.log('Henkilö', person)
+        personsArray.push(person)
+        console.log('personsArray', personsArray)
+    })
+    res.json(personsArray)
+  })
+  .catch((error) => {
+    console.log('ERROR', error.message)
+  });
 })
 
 app.get('/api/persons/:id', (req, res) => {
