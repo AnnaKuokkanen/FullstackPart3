@@ -11,41 +11,11 @@ app.use(cors())
 morgan.token('persondata', function (req, res) { return JSON.stringify(req.body) })
 app.use(morgan(':method :url :status :req[content-length] - :response-time ms :persondata'))
 
-// let persons = [
-//   {
-//       name: "Arto Hellas",
-//       number: "0312355390",
-//       id: 1
-//   },
-//   {
-//       name: "Ada Lovelace",
-//       number: "0234833950",
-//       id: 2
-//   },
-//   {
-//       name: "Alan Turing",
-//       number: "0403850394",
-//       id: 3
-//   },
-//   {
-//       name: "Charles Babbage",
-//       number: "0394023439",
-//       id: 4
-//   },
-//   {
-//       name: "John von Neumann", 
-//       number: "2438872390",
-//       id: 5
-//   }
-// ]
-
 app.get('/api/persons', (req, res) => {
   let persons = []
   Person.find({}).then(result => {
     result.forEach(person => {
-        console.log('Henkilö', person)
         persons.push(person)
-        console.log('personsArray', persons)
     })
     res.json(persons)
   })
@@ -55,15 +25,18 @@ app.get('/api/persons', (req, res) => {
 })
 
 app.get('/api/persons/:id', (req, res) => {
-  Person.findById(req.params.id).then(person => {
+  Person.findById(req.params.id)
+  .then(person => {
     if (person) {
       console.log('Löytyi henkilö', person)
       res.json(person)
-    } 
+    } else {
+      res.status(404).end()
+    }
   })
   .catch(error => {
-    res.status(404).end()
     console.log('ERROR', error.message)
+    res.status(500).end()
   });
 })
 
@@ -83,9 +56,10 @@ app.get('/info', (req, res) => {
 
 app.delete('/api/persons/:id', (req, res) => {
   const id = Number(req.params.id)
-  persons = persons.filter(person => person.id !== id)
-
-  res.status(204).end()
+  Person.findById(id).then(person => {
+    person.remove()
+    res.status(204).end()
+  })
 })
 
 app.post('/api/persons', (req, res) => {
@@ -102,7 +76,7 @@ app.post('/api/persons', (req, res) => {
     id: id,
   })
   p.save().then(savedPerson => {
-  res.json(savedPerson)
+    res.json(savedPerson)
   })
 })
 
