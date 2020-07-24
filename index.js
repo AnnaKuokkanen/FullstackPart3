@@ -85,9 +85,9 @@ app.put(`/api/persons/:id`, (req, res, next) => {
   }
   Person.findByIdAndUpdate(req.params.id, { number: person.number })
   .then(result => {
-    console.log('LÖYTYI:', result)
+    //console.log('LÖYTYI:', result)
     result.save().then(savedPerson => {
-      console.log('Päivitettiin', savedPerson)
+      //console.log('Päivitettiin', savedPerson)
       res.json(savedPerson)
     })
   })
