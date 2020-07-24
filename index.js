@@ -76,6 +76,24 @@ app.post('/api/persons', (req, res, next) => {
   .catch(error => next(error))
 })
 
+app.put(`/api/persons/:id`, (req, res, next) => {
+  const person = req.body
+  if (!person.name || !person.number) {
+    return res.status(400).json({ 
+      error: 'content missing' 
+    })
+  }
+  Person.findByIdAndUpdate(req.params.id, { number: person.number })
+  .then(result => {
+    console.log('LÖYTYI:', result)
+    result.save().then(savedPerson => {
+      console.log('Päivitettiin', savedPerson)
+      res.json(savedPerson)
+    })
+  })
+  .catch(error => next(error))
+})
+
 const unknownEndpoint = (req, res) => {
   res.status(404).send({ error: 'unknown endpoint' })
 }
