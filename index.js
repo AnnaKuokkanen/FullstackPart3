@@ -8,60 +8,52 @@ const Person = require('./models/person')
 app.use(express.json())
 app.use(express.static('build'))
 app.use(cors())
-morgan.token('persondata', function (req, res) { return JSON.stringify(req.body) })
+morgan.token('persondata', function (req) { return JSON.stringify(req.body) })
 app.use(morgan(':method :url :status :req[content-length] - :response-time ms :persondata'))
 
 app.get('/api/persons', (req, res, next) => {
   let persons = []
   Person.find({}).then(result => {
     result.forEach(person => {
-        persons.push(person)
+      persons.push(person)
     })
     res.json(persons)
-  })
-  .catch(error => next(error))
+  }).catch(error => next(error))
 })
 
 app.get('/api/persons/:id', (req, res, next) => {
-  Person.findById(req.params.id)
-  .then(person => {
+  Person.findById(req.params.id).then(person => {
     if (person) {
       console.log('Löytyi henkilö', person)
       res.json(person)
     } else {
       res.status(404).end()
     }
-  })
-  .catch(error => next(error))
+  }).catch(error => next(error))
 })
 
 app.get('/info', (req, res, next) => {
-  const date = new Date().getTime()
   let people = 0
-  Person.find({})
-  .then(result => {
+  Person.find({}).then(result => {
     result.forEach(person => {
       people = people + 1
     })
     res.send(`<p>Phonebook has info for ${people} people</p>
             <p>Date: ${new Date()}</p>`)
-  })
-  .catch(error => next(error))
+  }).catch(error => next(error))
 })
 
 app.delete('/api/persons/:id', (req, res, next) => {
-  Person.findByIdAndRemove(req.params.id)
-  .then(result => {
+  Person.findByIdAndRemove(req.params.id).then(res => {
     res.status(204).end()
-  })
-  .catch(error => next(error))
+  }).catch(error => next(error))
 })
 
 app.post('/api/persons', (req, res, next) => {
   const person = req.body
   if (!person.name || !person.number) {
-    return res.status(400).json({ 
-      error: 'content missing' 
+    return res.status(400).json({
+      error: 'content missing'
     })
   }
   const id = Math.round(Math.random() * 1000)
@@ -72,26 +64,21 @@ app.post('/api/persons', (req, res, next) => {
   })
   p.save().then(savedPerson => {
     res.json(savedPerson)
-  })
-  .catch(error => next(error))
+  }).catch(error => next(error))
 })
 
-app.put(`/api/persons/:id`, (req, res, next) => {
+app.put('/api/persons/:id', (req, res, next) => {
   const person = req.body
   if (!person.name || !person.number) {
-    return res.status(400).json({ 
-      error: 'content missing' 
+    return res.status(400).json({
+      error: 'content missing'
     })
   }
-  Person.findByIdAndUpdate(req.params.id, { number: person.number })
-  .then(result => {
-    //console.log('LÖYTYI:', result)
+  Person.findByIdAndUpdate(req.params.id, { number: person.number }).then(result => {
     result.save().then(savedPerson => {
-      //console.log('Päivitettiin', savedPerson)
       res.json(savedPerson)
     })
-  })
-  .catch(error => next(error))
+  }).catch(error => next(error))
 })
 
 const unknownEndpoint = (req, res) => {
